@@ -4,6 +4,8 @@
 
 #define NUM_THREADS 2
 
+pthread_barrier_t barrier;
+
 
 // TODO: de folosit bariera in aceasta functie
 void *f(void *arg)
@@ -14,6 +16,7 @@ void *f(void *arg)
 		printf("1\n");
 	}
 
+	pthread_barrier_wait(&barrier);
 	if (thread_id == 0) {
 		printf("2\n");
 	}
@@ -27,6 +30,13 @@ int main(int argc, char **argv)
 	void *status;
 	pthread_t threads[NUM_THREADS];
 	int arguments[NUM_THREADS];
+
+	int check_create;
+	check_create = pthread_barrier_init(&barrier, NULL, 2);
+	if (check_create) {
+		printf("Eroare la crearea barierei\n");
+		exit(-1);
+	}
 
 	for (i = 0; i < NUM_THREADS; i++) {
 		arguments[i] = i;
@@ -45,6 +55,12 @@ int main(int argc, char **argv)
 			printf("Eroare la asteptarea thread-ului %d\n", i);
 			exit(-1);
 		}
+	}
+
+	int check_destroy = pthread_barrier_destroy(&barrier);
+	if (check_destroy) {
+		printf("Eroare la distrugerea barierei\n");
+		exit(-1);
 	}
 
 	return 0;
