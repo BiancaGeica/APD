@@ -3,26 +3,26 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-// #define NUM_THREADS 8
+// #define NUM_THREADS 2
 
 void *f(void *arg) {
   long id = *(long *)arg;
   printf("Hello World din thread-ul %ld!\n", id);
-  pthread_exit(NULL); 
+  pthread_exit(NULL);
 }
 
 int main(int argc, char *argv[]) {
   long cores = sysconf(_SC_NPROCESSORS_CONF);
-
-  pthread_t threads[cores]; // vector cu id-ul fiecarui thread creat
-  int r; // starea thread-ului dupa creare, daca este diferit de 0, ceva nu a mers ok
-  long id; // variabila pentru ciclarea prin thread-uri
+  
+  pthread_t threads[cores];
+  int r;
+  long id;
   void *status;
   long ids[cores];
 
   for (id = 0; id < cores; id++) {
-    ids[id] = id; // stocam id-ul fiecarui thread creat in acest moment
-    r = pthread_create(&threads[id], NULL, f, &ids[id]); // creem thread-ul, apoi in r salvam starea dupa creare
+    ids[id] = id;
+    r = pthread_create(&threads[id], NULL, f, &ids[id]);
 
     if (r) {
       printf("Eroare la crearea thread-ului %ld\n", id);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   }
 
   for (id = 0; id < cores; id++) {
-    r = pthread_join(threads[id], &status); // obliga threadul specificat sa stea pe procesor pana se termina  
+    r = pthread_join(threads[id], &status);
 
     if (r) {
       printf("Eroare la asteptarea thread-ului %ld\n", id);
