@@ -1,0 +1,7 @@
+PTHREAD_BARRIER_SERIAL_THREAD = constanta pentru bariera, returnata la barrier wait
+
+bariera se foloseste spre exemplu cand vreau sa fac un calcul inaintea altui calcul (s-a dat un exemplu in care initial se vrea decrementarea unei variabile, apoi se vrea sa se incrementeze acea variabila)
+
+threadurile se fac doar pe main
+
+dupa ce s-a apelat join pe threaduri, nu se mai poate da crete iar pe ele, este overhead prea mare, mai bine utilizam bariera decat sa recream threaduri

@@ -5,14 +5,11 @@
 #define NUM_THREADS 2
 
 int a = 0;
-pthread_mutex_t mutex;
 
 // TODO: adaugati mutexul in functia de mai jos
 void *f(void *arg)
 {
-	pthread_mutex_lock(&mutex);
 	a += 2;
-	pthread_mutex_unlock(&mutex);
 
 	pthread_exit(NULL);
 }
@@ -23,12 +20,6 @@ int main(int argc, char *argv[])
 	void *status;
 	pthread_t threads[NUM_THREADS];
 	int arguments[NUM_THREADS];
-
-	int check_init = pthread_mutex_init(&mutex, NULL);
-	if (check_init) {
-		printf("Eroare la creearea mutexului\n");
-		exit(-1);
-	}
 
 	for (i = 0; i < NUM_THREADS; i++) {
 		arguments[i] = i;
@@ -50,12 +41,6 @@ int main(int argc, char *argv[])
 	}
 
 	printf("a = %d\n", a);
-
-	int check_destroy = pthread_mutex_destroy(&mutex);
-	if (check_destroy) {
-		printf("Eroare la disrugerea mutexului\n");
-		exit(-1);
-	}
 
 	return 0;
 }
