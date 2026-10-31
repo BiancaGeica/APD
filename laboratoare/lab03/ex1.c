@@ -3,20 +3,14 @@
 #include <pthread.h>
 #include <math.h>
 
-#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
-int N; // lungimea listei
+int N;
 int P;
 int *v;
 int *vQSort;
 
 pthread_barrier_t barrier;
-
-void swap(int *a, int *b) {
-    int c = *a;
-    *a = *b;
-    *b = c;
-}
 
 void compare_vectors(int *a, int *b) {
 	int i;
@@ -85,34 +79,40 @@ void print()
 	compare_vectors(v, vQSort);
 }
 
+void swap(int *a, int *b) {
+    int c = *a;
+    *a = *b;
+    *b = c;
+}
+
 void *thread_function(void *arg)
 {
 	int thread_id = *(int *)arg;
 
-    int start = thread_id * (double) N / P;
-    int end = MIN((thread_id + 1) * (double) N / P, N);
-
-    int start_par = (start % 2) ? (start + 1) : start;
-    int start_impar = (start % 2) ? start : (start + 1);
-
 	// TODO: implementati aici OETS paralel
-        for (int k = 0; k < N; k++) {
-            for (int i = start_par; i < end; i += 2) {
-                if (v[i] > v[i + 1]) {
-                    swap(&v[i], &v[i + 1]);
-                }
+    for (int k = 0; k < N; k++) {
+        double portiune = (double) N / P;
+        int start = thread_id * portiune;
+		int start_par = (start % 2 == 0) ? start : (start + 1);
+		int start_impar = (start % 2 == 0) ? (start + 1) : start;
+        int stop = MIN((thread_id + 1) * portiune, N - 1);
+
+        for (int i = start_par; i < stop; i += 2) {
+            if (v[i] > v[i + 1]) {
+                swap(&v[i], &v[i + 1]);
             }
-
-            pthread_barrier_wait(&barrier);
-
-            for (int i = start_impar; i < end; i += 2) {
-                if (v[i] > v[i + 1]) {
-                    swap(&v[i], &v[i + 1]);
-                }
-            }
-
-            pthread_barrier_wait(&barrier);
         }
+
+		pthread_barrier_wait(&barrier);
+
+        for (int i = start_impar; i < stop; i += 2) {
+            if (v[i] > v[i + 1]) {
+                swap(&v[i], &v[i + 1]);
+            }
+        }
+
+		pthread_barrier_wait(&barrier);
+    }
 
 	pthread_exit(NULL);
 }
@@ -122,16 +122,17 @@ int main(int argc, char *argv[])
 	get_args(argc, argv);
 	init();
 
-	int i, aux;
+	//int i, aux;
+    int i;
 	pthread_t tid[P];
 	int thread_id[P];
+
+	pthread_barrier_init(&barrier, NULL, P);
 
 	// se sorteaza vectorul etalon
 	for (i = 0; i < N; i++)
 		vQSort[i] = v[i];
 	qsort(vQSort, N, sizeof(int), cmp);
-
-    pthread_barrier_init(&barrier, NULL, P);
 
 	// se creeaza thread-urile
 	for (i = 0; i < P; i++) {
@@ -143,8 +144,6 @@ int main(int argc, char *argv[])
 	for (i = 0; i < P; i++) {
 		pthread_join(tid[i], NULL);
 	}
-
-    pthread_barrier_destroy(&barrier);
 
 	// bubble sort clasic - trebuie transformat in OETS si paralelizat
 	/* int sorted = 0;
@@ -168,6 +167,13 @@ int main(int argc, char *argv[])
 
 	free(v);
 	free(vQSort);
+
+    /* int a = 5;
+    int b = 6;
+    swap(&a, &b);
+    printf("a = %d si b = %d\n", a, b); */
+
+	pthread_barrier_destroy(&barrier);
 
 	return 0;
 }

@@ -12,8 +12,8 @@ public class Main {
 
         // Parallelize me (You might want to keep the original code in order to compare)
         for (int k = 0; k < 5; k++) {
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 5; j++) {
+            for (int i = 0; i < 5; i++) { // surse
+                for (int j = 0; j < 5; j++) { // destinatii
                     graph[i][j] = Math.min(graph[i][k] + graph[k][j], graph[i][j]);
                 }
             }
