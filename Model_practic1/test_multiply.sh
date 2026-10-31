@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 N=1000
-P=2
+P=3
 
-gcc dem_seq.c -o seq -lpthread -Wall
-gcc dem_parallel.c -o parallel -lpthread -Wall
+gcc multiply_seq.c -o seq -lpthread -Wall
+gcc rezolvare_test1.c -o parallel -lpthread -Wall
 
 if [ ! -f "seq" ]
 then
